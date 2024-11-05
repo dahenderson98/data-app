@@ -4,6 +4,7 @@ public class DataManager
 {
     public IDataFetcher DataFetcher { get; set; }
     public IDataStorage DataStorage { get; set; }
+    
     protected object _writeLock;
 
     public DataManager()
