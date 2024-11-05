@@ -2,13 +2,15 @@
 
 public class DataManager
 {
-    private DataFetcher _dataFetcher;
-    private DataStorage _dataStorage;
+    public IDataFetcher DataFetcher { get; set; }
+    public IDataStorage DataStorage { get; set; }
+    protected object _writeLock;
 
     public DataManager()
     {
-        _dataFetcher = new DataFetcher();
-        _dataStorage = new DataStorage();
+        DataFetcher = new DataFetcher();
+        DataStorage = new DataStorage();
+        _writeLock = new();
     }
 
     /// <summary>
@@ -24,12 +26,17 @@ public class DataManager
             return -1;
         }
 
-        var data = _dataFetcher.FetchData(dataId);
+        var data = DataFetcher.FetchData(dataId);
         if (string.IsNullOrWhiteSpace(data))
         {
             return -2;
         }
-        _dataStorage.StoreData(dataId, data);
+
+        lock (_writeLock)
+        {
+            DataStorage.StoreData(dataId, data);
+        }
+
         return 0;
     }
 }
